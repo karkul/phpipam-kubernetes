@@ -1,0 +1,53 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: phpipam-deploy
+spec:
+  selector:
+    matchLabels:
+      app: phpipam     
+  template:
+    metadata:
+      labels:
+        app: phpipam
+    spec:
+      containers:
+      - name: phpipam-web
+        image: phpipam/phpipam-www:latest
+        env:
+        - name: IPAM_DATABASE_HOST
+          value: mariadb-svc
+        - name: IPAM_DATABASE_USER
+          value: root
+        - name: IPAM_DATABASE_NAME
+          value: phpipam
+        - name: IPAM_DATABASE_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        ports:
+        - containerPort: 80
+          name: phpipam-web
+        volumeMounts:
+        - name: phpipam-logo
+          mountPath: /var/www/html
+      # -- PHPIPAM CRON container
+      - name: phpipam-cron
+        image: phpipam/phpipam-cron:latest
+        env:
+        - name: IPAM_DATABASE_HOST
+          value: mariadb-svc
+        - name: IPAM_DATABASE_USER
+          value: root
+        - name: IPAM_DATABASE_NAME
+          value: phpipam
+        - name: IPAM_DATABASE_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password        
+      volumes:
+      - name: phpipam-logo
+        emptyDir: {}
+

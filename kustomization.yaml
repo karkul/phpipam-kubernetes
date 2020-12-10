@@ -1,0 +1,8 @@
+secretGenerator:
+- name: mysql-pass
+  literals:
+  - password=MyS3cret!
+resources:
+- mysql-deployment.yaml
+- mysql-configmap.yaml 
+- phpipam-deployment.yaml
